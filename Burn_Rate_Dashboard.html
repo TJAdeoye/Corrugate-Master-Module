@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Corrugate Burn Rate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Fraunces:ital,wght@0,400;0,600;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1114;--bg-panel:#16191e;--bg-elev:#1d2128;--border:#272c35;--border-bright:#3a414e;
+--text:#e8e9ec;--text-dim:#8a8f99;--text-faint:#5a5f6a;--amber:#f4a52a;--red:#ef4444;--green:#10b981;--blue:#60a5fa;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'JetBrains Mono',Consolas,monospace;background:var(--bg);color:var(--text);font-size:13px;line-height:1.5;
+background-image:radial-gradient(circle at 15% 0%,rgba(244,165,42,.035),transparent 42%),radial-gradient(circle at 85% 100%,rgba(96,165,250,.03),transparent 42%);}
+.container{max-width:1400px;margin:0 auto;padding:28px 32px 90px}
+header{border-bottom:1px solid var(--border);padding-bottom:20px;margin-bottom:22px;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:end}
+.eyebrow{font-size:10px;letter-spacing:.2em;color:var(--text-faint);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.eyebrow::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
+h1{font-family:'Fraunces',serif;font-weight:800;font-size:36px;letter-spacing:-.02em;line-height:1}
+h1 em{font-style:italic;font-weight:400;color:var(--amber)}
+.header-meta{text-align:right;font-size:11px;color:var(--text-dim);line-height:1.9}
+.header-meta .label{color:var(--text-faint);text-transform:uppercase;letter-spacing:.1em}
+.header-meta .value{color:var(--text);font-weight:500}
+.banner{display:flex;gap:14px;align-items:flex-start;border-left:2px solid var(--red);background:rgba(239,68,68,.06);
+padding:14px 18px;margin-bottom:20px;font-size:11px;color:var(--text-dim);line-height:1.8}
+.banner b{color:var(--red);text-transform:uppercase;letter-spacing:.12em;font-size:10px;white-space:nowrap}
+.banner.amber{border-color:var(--amber);background:rgba(244,165,42,.05)}
+.banner.amber b{color:var(--amber)}
+.controls{display:flex;gap:26px;align-items:center;flex-wrap:wrap;margin-bottom:22px;
+padding:14px 18px;background:var(--bg-panel);border:1px solid var(--border)}
+.cgroup{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+.cgroup .lbl{font-size:10px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.12em;margin-right:8px}
+.filter-btn{background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:inherit;font-size:10px;
+letter-spacing:.1em;text-transform:uppercase;padding:6px 12px;cursor:pointer;transition:all .15s}
+.filter-btn:hover{color:var(--text);border-color:var(--border-bright)}
+.filter-btn.active{background:var(--text);color:var(--bg);border-color:var(--text);font-weight:700}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:26px}
+.kpi{background:var(--bg-panel);border:1px solid var(--border);padding:18px 20px;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--border-bright)}
+.kpi.alert::before{background:var(--red)}.kpi.warn::before{background:var(--amber)}
+.kpi-label{font-size:10px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px}
+.kpi-value{font-family:'Fraunces',serif;font-size:32px;font-weight:600;line-height:1}
+.kpi-value.alert{color:var(--red)}.kpi-value.warn{color:var(--amber)}
+.kpi-value small{font-size:16px;color:var(--text-faint)}
+.kpi-sub{font-size:11px;color:var(--text-dim);margin-top:6px}
+.site{margin-bottom:40px}
+.site-head{display:grid;grid-template-columns:auto 1fr auto;gap:20px;align-items:center;margin-bottom:16px;
+padding-bottom:14px;border-bottom:2px solid var(--border-bright)}
+.site-name{font-family:'Fraunces',serif;font-size:26px;font-weight:600}
+.site-tag{font-size:10px;border:1px solid var(--border-bright);color:var(--text-faint);padding:4px 9px;letter-spacing:.1em}
+.site-tag.hk1{color:var(--amber);border-color:var(--amber)}
+.site-tag.bp1{color:var(--blue);border-color:var(--blue)}
+.pill.hk1{color:var(--amber);border-color:var(--amber)}
+.pill.bp1{color:var(--blue);border-color:var(--blue)}
+.site-win{font-size:11px;color:var(--text-dim);text-align:right}
+.site-win b{color:var(--text)}
+.panel{background:var(--bg-panel);border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead tr{background:var(--bg-elev)}
+th{text-align:left;padding:10px 13px;font-size:10px;font-weight:500;color:var(--text-faint);text-transform:uppercase;
+letter-spacing:.1em;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;white-space:nowrap}
+th:hover{color:var(--text)}
+th.num,td.num{text-align:right}
+th .arrow{opacity:0;margin-left:4px;font-size:9px}
+th.sorted .arrow{opacity:1;color:var(--amber)}
+td{padding:9px 13px;border-bottom:1px solid var(--border)}
+tbody tr:hover{background:rgba(255,255,255,.015)}
+tbody tr:last-child td{border-bottom:none}
+td.sku{color:var(--text);font-weight:500}
+td.crit{color:var(--red);font-weight:500}td.warn{color:var(--amber);font-weight:500}
+td.good{color:var(--green)}td.faint{color:var(--text-faint)}
+td.recv{color:var(--blue)}
+.pill{display:inline-block;padding:2px 8px;font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;border:1px solid}
+.pill.crit{color:var(--red);border-color:var(--red)}
+.pill.warn{color:var(--amber);border-color:var(--amber)}
+.pill.good{color:var(--green);border-color:var(--green)}
+.pill.none{color:var(--text-faint);border-color:var(--border)}
+.flag{color:var(--red);font-size:11px;cursor:help}
+.warnlist{margin-top:26px;padding:16px 20px;border-left:2px solid var(--amber);background:rgba(244,165,42,.05);
+font-size:11px;color:var(--text-dim);line-height:1.9}
+.warnlist b{color:var(--amber);text-transform:uppercase;letter-spacing:.12em;font-size:10px}
+.warnlist ul{margin:6px 0 0 16px}
+@media(max-width:1000px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){.container{padding:18px 16px 60px}header{grid-template-columns:1fr}.header-meta{text-align:left}
+h1{font-size:27px}.kpi-row{grid-template-columns:1fr}.site-head{grid-template-columns:1fr}th,td{padding:8px 9px}}
+</style></head><body><div class="container">
+
+<header>
+  <div>
+    <div class="eyebrow">HK1 & BP1 · 21-day rolling</div>
+    <h1>Corrugate <em>Burn</em> Rate</h1>
+  </div>
+  <div class="header-meta">
+    <div><span class="label">Window</span> &nbsp; <span class="value">21 days to Sep 16, 2026</span></div>
+    <div><span class="label">Receipts logged</span> &nbsp; <span class="value">4 of 22 days</span></div>
+    <div><span class="label">Generated</span> &nbsp; <span class="value">Sep 16, 2026 5:29 PM</span></div>
+  </div>
+</header>
+
+<div class="banner amber"><b>3 awaiting delivery</b><span>On the delivery file with an ETA but no delivered quantity: 14x14x14 Plain (HK1), 14x14x8 Plain (HK1), 16x16x10 Printed (HK1). Not counted as received.</span></div><section class="site"><div class="site-head"><span class="site-tag" style="color:var(--red);border-color:var(--red)">ETA MISS</span><div class="site-name">Delivered off the promised date</div><div class="site-win"><b>3</b> deliveries &nbsp;-&nbsp; 2 late, 1 early</div></div><div class="panel"><table><thead><tr><th>DC</th><th>SKU</th><th class="num">Qty</th><th>ETA</th><th>Actual</th><th class="num">Variance</th></tr></thead><tbody><tr><td><span class="pill bp1">BP1</span></td><td class="sku">16x16x16 Plain</td><td class="num">8</td><td class="faint">2026-09-10</td><td>2026-09-14</td><td class="num crit">+4d</td></tr><tr><td><span class="pill hk1">HK1</span></td><td class="sku">12x12x8 Plain</td><td class="num">14</td><td class="faint">2026-09-09</td><td>2026-09-11</td><td class="num crit">+2d</td></tr><tr><td><span class="pill hk1">HK1</span></td><td class="sku">16x16x10 Plain</td><td class="num">10</td><td class="faint">2026-09-12</td><td>2026-09-10</td><td class="num good">-2d</td></tr></tbody></table></div></section>
+
+<div class="controls">
+  <div class="cgroup">
+    <span class="lbl">Method</span>
+    <button class="filter-btn " data-m="net">Receipt-adjusted</button>
+    <button class="filter-btn active" data-m="drops">Count drops only</button>
+  </div>
+  <div class="cgroup">
+    <span class="lbl">Show</span>
+    <button class="filter-btn active" data-f="all">All</button>
+    <button class="filter-btn" data-f="active">Burning</button>
+    <button class="filter-btn" data-f="crit">Critical</button>
+    <button class="filter-btn" data-f="flagged">Flagged</button>
+  </div>
+</div>
+
+<div class="kpi-row" id="kpis"></div>
+<div id="sites"></div>
+
+
+</div>
+<script>
+const SITES = [{"site": "BP1", "siteName": "Bedford Park 1", "countDays": 15, "firstDay": "2026-08-27", "lastDay": "2026-09-16", "rows": [{"sku": "16x16x10 Plain", "onHand": 8.0, "burnNet": 0.4, "burnDrops": 1.8, "coverNet": 20.0, "coverDrops": 4.4, "received": 0.0, "intervals": 14, "negatives": 1, "thin": false}, {"sku": "16x16x16 Plain", "onHand": 2.0, "burnNet": 1.1, "burnDrops": 1.6, "coverNet": 1.8, "coverDrops": 1.2, "received": 8.0, "intervals": 14, "negatives": 1, "thin": false}, {"sku": "14x14x8 Plain", "onHand": 2.0, "burnNet": 0.25, "burnDrops": 0.85, "coverNet": 8.0, "coverDrops": 2.4, "received": 0.0, "intervals": 14, "negatives": 1, "thin": false}, {"sku": "14x14x14 Plain", "onHand": 9.0, "burnNet": -0.45, "burnDrops": 0.8, "coverNet": null, "coverDrops": 11.2, "received": 0.0, "intervals": 14, "negatives": 2, "thin": false}, {"sku": "12x12x8 Printed", "onHand": 7.0, "burnNet": 0.0, "burnDrops": 0.55, "coverNet": null, "coverDrops": 12.7, "received": 0.0, "intervals": 14, "negatives": 1, "thin": false}, {"sku": "14x14x8 Printed", "onHand": 2.0, "burnNet": 0.5, "burnDrops": 0.55, "coverNet": 4.0, "coverDrops": 3.6, "received": 0.0, "intervals": 14, "negatives": 1, "thin": false}, {"sku": "12x12x8 Plain", "onHand": 14.0, "burnNet": -0.45, "burnDrops": 0.35, "coverNet": null, "coverDrops": 40.0, "received": 0.0, "intervals": 14, "negatives": 3, "thin": false}, {"sku": "14x14x10 Plain", "onHand": 7.0, "burnNet": 0.35, "burnDrops": 0.35, "coverNet": 20.0, "coverDrops": 20.0, "received": 0.0, "intervals": 14, "negatives": 0, "thin": false}, {"sku": "14x14x14 Printed", "onHand": 27.0, "burnNet": -0.9, "burnDrops": 0.3, "coverNet": null, "coverDrops": 90.0, "received": 0.0, "intervals": 14, "negatives": 3, "thin": false}, {"sku": "16x16x10 Printed", "onHand": 0.0, "burnNet": 0.05, "burnDrops": 0.3, "coverNet": 0.0, "coverDrops": 0.0, "received": 0.0, "intervals": 14, "negatives": 1, "thin": false}, {"sku": "14x14x8 CH", "onHand": 12.0, "burnNet": -0.2, "burnDrops": 0.3, "coverNet": null, "coverDrops": 40.0, "received": 0.0, "intervals": 14, "negatives": 1, "thin": false}, {"sku": "14x14x10 Printed", "onHand": 3.0, "burnNet": 0.2, "burnDrops": 0.2, "coverNet": 15.0, "coverDrops": 15.0, "received": 0.0, "intervals": 14, "negatives": 0, "thin": false}, {"sku": "16x16x10 CH", "onHand": 3.0, "burnNet": -0.15, "burnDrops": 0.2, "coverNet": null, "coverDrops": 15.0, "received": 0.0, "intervals": 14, "negatives": 1, "thin": false}, {"sku": "14x14x6 CH", "onHand": 0.0, "burnNet": 0.2, "burnDrops": 0.2, "coverNet": 0.0, "coverDrops": 0.0, "received": 0.0, "intervals": 14, "negatives": 0, "thin": false}, {"sku": "14x14x14 CH", "onHand": 13.0, "burnNet": -0.5, "burnDrops": 0.15, "coverNet": null, "coverDrops": 86.7, "received": 0.0, "intervals": 14, "negatives": 1, "thin": false}, {"sku": "16x16x16 CH", "onHand": 0.0, "burnNet": 0.05, "burnDrops": 0.1, "coverNet": 0.0, "coverDrops": 0.0, "received": 0.0, "intervals": 14, "negatives": 1, "thin": false}, {"sku": "14x14x10 CH", "onHand": 3.0, "burnNet": 0.1, "burnDrops": 0.1, "coverNet": 30.0, "coverDrops": 30.0, "received": 0.0, "intervals": 14, "negatives": 0, "thin": false}, {"sku": "Pallet Sheets", "onHand": 1.0, "burnNet": 0.05, "burnDrops": 0.05, "coverNet": 20.0, "coverDrops": 20.0, "received": 0.0, "intervals": 14, "negatives": 0, "thin": false}, {"sku": "Wiper Boxes", "onHand": 7.0, "burnNet": 0.05, "burnDrops": 0.05, "coverNet": 140.0, "coverDrops": 140.0, "received": 0.0, "intervals": 14, "negatives": 0, "thin": false}, {"sku": "16x16x20", "onHand": 0.0, "burnNet": 0.0, "burnDrops": 0.0, "coverNet": null, "coverDrops": null, "received": 0.0, "intervals": 14, "negatives": 0, "thin": false}, {"sku": "16x16x12 Printed", "onHand": 0.0, "burnNet": 0.0, "burnDrops": 0.0, "coverNet": null, "coverDrops": null, "received": 0.0, "intervals": 14, "negatives": 0, "thin": false}, {"sku": "14x14x18", "onHand": 0.0, "burnNet": 0.0, "burnDrops": 0.0, "coverNet": null, "coverDrops": null, "received": 0.0, "intervals": 14, "negatives": 0, "thin": false}, {"sku": "16x16x16 Printed", "onHand": 0.0, "burnNet": 0.0, "burnDrops": 0.0, "coverNet": null, "coverDrops": null, "received": 0.0, "intervals": 14, "negatives": 0, "thin": false}, {"sku": "Pallet Chimney", "onHand": 6.0, "burnNet": 0.0, "burnDrops": 0.0, "coverNet": null, "coverDrops": null, "received": 0.0, "intervals": 14, "negatives": 0, "thin": false}, {"sku": "17x17x22 Printed", "onHand": 0.0, "burnNet": 0.0, "burnDrops": 0.0, "coverNet": null, "coverDrops": null, "received": 0.0, "intervals": 14, "negatives": 0, "thin": false}, {"sku": "Chimney Inserts", "onHand": 2.0, "burnNet": 0.0, "burnDrops": 0.0, "coverNet": null, "coverDrops": null, "received": 0.0, "intervals": 14, "negatives": 0, "thin": false}]}, {"site": "HK1", "siteName": "Hodgkins 1", "countDays": 16, "firstDay": "2026-08-26", "lastDay": "2026-09-16", "rows": [{"sku": "12x12x8 Plain", "onHand": 21.0, "burnNet": 0.67, "burnDrops": 2.38, "coverNet": 31.5, "coverDrops": 8.8, "received": 14.0, "intervals": 15, "negatives": 7, "thin": false}, {"sku": "14x14x14 Printed", "onHand": 27.0, "burnNet": 0.86, "burnDrops": 2.24, "coverNet": 31.5, "coverDrops": 12.1, "received": 20.0, "intervals": 15, "negatives": 6, "thin": false}, {"sku": "14x14x10 Printed", "onHand": 33.0, "burnNet": -0.76, "burnDrops": 2.0, "coverNet": null, "coverDrops": 16.5, "received": 0.0, "intervals": 15, "negatives": 7, "thin": false}, {"sku": "16x16x10 Plain", "onHand": 5.0, "burnNet": 1.0, "burnDrops": 1.95, "coverNet": 5.0, "coverDrops": 2.6, "received": 15.0, "intervals": 15, "negatives": 4, "thin": false}, {"sku": "16x16x16 Plain", "onHand": 10.0, "burnNet": -0.29, "burnDrops": 1.71, "coverNet": null, "coverDrops": 5.8, "received": 4.0, "intervals": 15, "negatives": 6, "thin": false}, {"sku": "14x14x14 Plain", "onHand": 4.0, "burnNet": 0.19, "burnDrops": 1.62, "coverNet": 21.0, "coverDrops": 2.5, "received": 0.0, "intervals": 15, "negatives": 3, "thin": false}, {"sku": "12x12x8 Printed", "onHand": 11.0, "burnNet": -0.14, "burnDrops": 1.57, "coverNet": null, "coverDrops": 7.0, "received": 0.0, "intervals": 15, "negatives": 7, "thin": false}, {"sku": "14x14x8 Printed", "onHand": 7.0, "burnNet": 0.33, "burnDrops": 1.52, "coverNet": 21.0, "coverDrops": 4.6, "received": 0.0, "intervals": 15, "negatives": 3, "thin": false}, {"sku": "16x16x16 Printed", "onHand": 6.0, "burnNet": 0.24, "burnDrops": 1.48, "coverNet": 25.2, "coverDrops": 4.1, "received": 0.0, "intervals": 15, "negatives": 4, "thin": false}, {"sku": "14x14x10 Plain", "onHand": 7.0, "burnNet": 0.05, "burnDrops": 1.33, "coverNet": 147.0, "coverDrops": 5.2, "received": 0.0, "intervals": 15, "negatives": 5, "thin": false}, {"sku": "16x16x12 Printed", "onHand": 0.0, "burnNet": 0.43, "burnDrops": 1.24, "coverNet": 0.0, "coverDrops": 0.0, "received": 5.0, "intervals": 15, "negatives": 6, "thin": false}, {"sku": "16x16x20", "onHand": 4.0, "burnNet": 0.1, "burnDrops": 1.2, "coverNet": 40.0, "coverDrops": 3.3, "received": 4.0, "intervals": 14, "negatives": 5, "thin": false}, {"sku": "14x14x8 Plain", "onHand": 2.0, "burnNet": -0.1, "burnDrops": 1.19, "coverNet": null, "coverDrops": 1.7, "received": 0.0, "intervals": 15, "negatives": 7, "thin": false}, {"sku": "16x16x10 Printed", "onHand": 7.0, "burnNet": -0.33, "burnDrops": 1.1, "coverNet": null, "coverDrops": 6.4, "received": 0.0, "intervals": 15, "negatives": 6, "thin": false}, {"sku": "14x14x18", "onHand": 14.0, "burnNet": 0.05, "burnDrops": 1.0, "coverNet": 294.0, "coverDrops": 14.0, "received": 0.0, "intervals": 15, "negatives": 4, "thin": false}, {"sku": "Pallet Chimney", "onHand": 7.0, "burnNet": 0.05, "burnDrops": 0.67, "coverNet": 147.0, "coverDrops": 10.5, "received": 0.0, "intervals": 15, "negatives": 4, "thin": false}, {"sku": "17x17x22 Printed", "onHand": 8.0, "burnNet": -0.33, "burnDrops": 0.62, "coverNet": null, "coverDrops": 12.9, "received": 0.0, "intervals": 15, "negatives": 5, "thin": false}, {"sku": "Wiper Boxes", "onHand": 10.0, "burnNet": -0.24, "burnDrops": 0.57, "coverNet": null, "coverDrops": 17.5, "received": 0.0, "intervals": 15, "negatives": 5, "thin": false}, {"sku": "Pallet Sheets", "onHand": 7.0, "burnNet": -0.24, "burnDrops": 0.48, "coverNet": null, "coverDrops": 14.7, "received": 0.0, "intervals": 15, "negatives": 7, "thin": false}, {"sku": "14x14x6 CH", "onHand": 0.0, "burnNet": 0.0, "burnDrops": 0.1, "coverNet": null, "coverDrops": 0.0, "received": 0.0, "intervals": 15, "negatives": 1, "thin": false}, {"sku": "14x14x8 CH", "onHand": 0.0, "burnNet": 0.0, "burnDrops": 0.05, "coverNet": null, "coverDrops": 0.0, "received": 0.0, "intervals": 15, "negatives": 1, "thin": false}, {"sku": "Chimney Inserts", "onHand": 5.0, "burnNet": -0.24, "burnDrops": 0.0, "coverNet": null, "coverDrops": null, "received": 0.0, "intervals": 15, "negatives": 1, "thin": false}, {"sku": "16x16x10 CH", "onHand": 0.0, "burnNet": 0.0, "burnDrops": 0.0, "coverNet": null, "coverDrops": null, "received": 0.0, "intervals": 15, "negatives": 0, "thin": false}, {"sku": "16x16x16 CH", "onHand": 0.0, "burnNet": 0.0, "burnDrops": 0.0, "coverNet": null, "coverDrops": null, "received": 0.0, "intervals": 15, "negatives": 0, "thin": false}, {"sku": "14x14x14 CH", "onHand": 0.0, "burnNet": 0.0, "burnDrops": 0.0, "coverNet": null, "coverDrops": null, "received": 0.0, "intervals": 15, "negatives": 0, "thin": false}, {"sku": "14x14x10 CH", "onHand": 0.0, "burnNet": 0.0, "burnDrops": 0.0, "coverNet": null, "coverDrops": null, "received": 0.0, "intervals": 15, "negatives": 0, "thin": false}]}];
+const CRIT = 2, WATCH = 5, ETA_MISS = 3;
+let METHOD = 'drops', FILTER = 'all';
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = n => (n === null || n === undefined) ? '-' : Number(n).toLocaleString('en-US');
+const f2 = n => (n === null || n === undefined) ? '-' : Number(n).toFixed(2);
+const f1 = n => (n === null || n === undefined) ? '-' : Number(n).toFixed(1);
+const burnOf = r => METHOD === 'net' ? r.burnNet : r.burnDrops;
+const coverOf = r => METHOD === 'net' ? r.coverNet : r.coverDrops;
+
+function tier(r){
+  const b = burnOf(r), c = coverOf(r);
+  if (b === null || b <= 0) return 'none';
+  if (r.onHand === 0) return 'crit';
+  if (c === null) return 'none';
+  if (c <= CRIT) return 'crit';
+  if (c <= WATCH) return 'warn';
+  return 'good';
+}
+const label = t => ({crit:'Critical', warn:'Watch', good:'Healthy', none:'No burn'})[t];
+
+function visible(rows){
+  if (FILTER === 'active')  return rows.filter(r => (burnOf(r) || 0) > 0);
+  if (FILTER === 'crit')    return rows.filter(r => tier(r) === 'crit');
+  if (FILTER === 'flagged') return rows.filter(r => r.negatives > 0 || r.thin);
+  return rows;
+}
+
+function renderKpis(){
+  const all = SITES.flatMap(s => s.rows);
+  const crit = all.filter(r => tier(r) === 'crit').length;
+  const warn = all.filter(r => tier(r) === 'warn').length;
+  const flagged = all.filter(r => r.negatives > 0).length;
+  const recv = all.reduce((s,r) => s + (r.received || 0), 0);
+  document.getElementById('kpis').innerHTML = `
+    <div class="kpi ${crit ? 'alert' : ''}">
+      <div class="kpi-label">Critical SKUs</div>
+      <div class="kpi-value ${crit ? 'alert' : ''}">${crit}</div>
+      <div class="kpi-sub">zero on hand or &le; ${CRIT} days cover</div>
+    </div>
+    <div class="kpi ${warn > 2 ? 'warn' : ''}">
+      <div class="kpi-label">Watch SKUs</div>
+      <div class="kpi-value ${warn > 2 ? 'warn' : ''}">${warn}</div>
+      <div class="kpi-sub">${CRIT}-${WATCH} days of cover</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Units received</div>
+      <div class="kpi-value">${fmt(recv)}</div>
+      <div class="kpi-sub">logged in the window</div>
+    </div>
+    <div class="kpi ${ETA_MISS ? 'alert' : ''}">
+      <div class="kpi-label">ETA misses</div>
+      <div class="kpi-value ${ETA_MISS ? 'alert' : ''}">${ETA_MISS}</div>
+      <div class="kpi-sub">delivered off the promised date</div>
+    </div>
+    <div class="kpi ${flagged ? 'warn' : ''}" style="display:none">
+      <div class="kpi-label">Flagged lines</div>
+      <div class="kpi-value ${flagged ? 'warn' : ''}">${flagged}</div>
+      <div class="kpi-sub">count rose with no receipt logged</div>
+    </div>`;
+}
+
+function renderSites(){
+  document.getElementById('sites').innerHTML = SITES.map(s => {
+    const rows = visible(s.rows);
+    return `<section class="site">
+      <div class="site-head">
+        <span class="site-tag ${s.site.toLowerCase()}">${esc(s.site)}</span>
+        <div class="site-name">${esc(s.siteName)}</div>
+        <div class="site-win"><b>${s.countDays}</b> count days &nbsp;·&nbsp; ${esc(s.firstDay)} → <b>${esc(s.lastDay)}</b></div>
+      </div>
+      <div class="panel"><table>
+        <thead><tr>
+          <th data-s="sku">SKU <span class="arrow">▼</span></th>
+          <th class="num" data-s="onHand">On hand <span class="arrow">▼</span></th>
+          <th class="num sorted" data-s="burn">Burn / day <span class="arrow">▼</span></th>
+          <th class="num" data-s="cover">Days cover <span class="arrow">▼</span></th>
+          <th class="num" data-s="received">Received <span class="arrow">▼</span></th>
+          <th class="num" data-s="intervals">Intervals <span class="arrow">▼</span></th>
+          <th data-s="status">Status <span class="arrow">▼</span></th>
+        </tr></thead>
+        <tbody>${rows.length ? rows.map(r => {
+          const t = tier(r);
+          return `<tr>
+            <td class="sku">${esc(r.sku)}${r.negatives ? ` <span class="flag" title="${r.negatives} of ${r.intervals} intervals show a stock increase with no receipt logged">&#9650;</span>` : ''}</td>
+            <td class="num ${r.onHand === 0 ? 'crit' : ''}">${fmt(r.onHand)}</td>
+            <td class="num">${f2(burnOf(r))}</td>
+            <td class="num ${t}">${f1(coverOf(r))}</td>
+            <td class="num ${r.received ? 'recv' : 'faint'}">${r.received ? fmt(r.received) : '-'}</td>
+            <td class="num faint">${r.intervals}</td>
+            <td><span class="pill ${t}">${label(t)}</span></td>
+          </tr>`;
+        }).join('') : '<tr><td colspan="7" style="padding:26px;text-align:center;color:var(--text-faint)">Nothing matches this filter.</td></tr>'}</tbody>
+      </table></div>
+    </section>`;
+  }).join('');
+
+  document.querySelectorAll('#sites th').forEach(th => th.addEventListener('click', () => {
+    const k = th.dataset.s;
+    SITES.forEach(s => s.rows.sort((a,b) => {
+      let av, bv;
+      if (k === 'burn'){ av = burnOf(a); bv = burnOf(b); }
+      else if (k === 'cover'){ av = coverOf(a); bv = coverOf(b); }
+      else if (k === 'status'){ av = tier(a); bv = tier(b); }
+      else { av = a[k]; bv = b[k]; }
+      if (av === null || av === undefined) av = -Infinity;
+      if (bv === null || bv === undefined) bv = -Infinity;
+      if (av < bv) return 1; if (av > bv) return -1; return 0;
+    }));
+    renderSites();
+  }));
+}
+
+function renderAll(){ renderKpis(); renderSites(); }
+
+document.querySelectorAll('[data-m]').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('[data-m]').forEach(x => x.classList.remove('active'));
+  b.classList.add('active'); METHOD = b.dataset.m; renderAll();
+}));
+document.querySelectorAll('[data-f]').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('[data-f]').forEach(x => x.classList.remove('active'));
+  b.classList.add('active'); FILTER = b.dataset.f; renderAll();
+}));
+renderAll();
+</script></body></html>

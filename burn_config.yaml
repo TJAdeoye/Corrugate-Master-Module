@@ -1,0 +1,73 @@
+# =============================================================================
+# burn_config.yaml - configuration for burn_rate_dashboard.py
+#
+#   python burn_rate_dashboard.py --config "Configuration\burn_config.yaml"
+#
+# Lives in:
+#   ...\HK1 Projects 2026\Corrugate Master Module\Configuration\
+# =============================================================================
+
+paths:
+  # Daily count tracker. Most recently modified workbook in the folder is used.
+  tracker_folder: 'C:\Users\Olatunji.Adeoye\OneDrive - Power Stop, LLC\Documents\HK1 Projects 2026\Corrugate Master Module\Corrugate Counts'
+  tracker_file: null          # pin one workbook instead, or leave null
+
+  # Delivery file - supplies the "received" side of the burn formula.
+  delivery_folder: 'C:\Users\Olatunji.Adeoye\OneDrive - Power Stop, LLC\Documents\HK1 Projects 2026\Corrugate Master Module\Corrugate Delivery File'
+  delivery_file: null
+
+  output_html: 'C:\Users\Olatunji.Adeoye\OneDrive - Power Stop, LLC\Documents\HK1 Projects 2026\Corrugate Master Module\Corrugate Counts\Burn_Rate_Dashboard.html'
+  archive_folder: 'C:\Users\Olatunji.Adeoye\OneDrive - Power Stop, LLC\Documents\HK1 Projects 2026\Corrugate Master Module\Dashboard Archive'
+
+window:
+  # Rolling window, counted backwards from as_of.
+  days: 21
+  # null = today. Set a date (YYYY-MM-DD) to reproduce a past day's numbers.
+  as_of: null
+
+thresholds:
+  critical_days: 2
+  watch_days: 5
+  # A SKU with fewer than this many count-to-count intervals in the window is
+  # marked thin - too little history for the burn figure to mean much.
+  min_intervals: 2
+
+display:
+  title: 'Corrugate Burn Rate'
+  title_emphasis: 'Burn'
+  eyebrow: 'HK1 & BP1 · 21-day rolling'
+  show_parse_warnings: false
+
+  # Which burn method the dashboard opens on.
+  #   drops -> count drops only; ignores restocks. Correct while the delivery
+  #            file is still being backfilled.
+  #   net   -> prior count - current count + received. The right method, and
+  #            what you want once receipts are logged every day.
+  # Switch this to 'net' when the flagged-line count on the dashboard has
+  # dropped close to zero. Either way both are one click apart in the UI.
+  default_method: 'drops'
+
+# =============================================================================
+# Location values are read from the tracker's Location column and from the
+# delivery file's tab names. Built-in: HK, HK1, Hodgkins, BP, BP1, Bedford,
+# Bedford Park. Add anything unusual here.
+# =============================================================================
+sites: {}
+
+# =============================================================================
+# Retired SKUs - columns still present in the tracker but no longer stocked.
+# These are dropped from the dashboard entirely.
+#
+# NOT listed here on purpose: 14x14x8 CH and 14x14x6 CH. Both still show live
+# counts, even though neither appears in the box nomenclature table. They are
+# shown so active stock is not hidden - decide whether they are real SKUs that
+# belong in the nomenclature, or mislabelled columns that should be retired.
+# =============================================================================
+archived_skus:
+  - '12x12x6 Plain'
+  - '12x12x6 Printed'
+  - '14x14x6 Plain'
+  - '14x14x6 Printed'
+  - '18x18x4'
+  - '16x16x4'
+  - '18x18x10'

@@ -1,0 +1,54 @@
+# =============================================================================
+# requests_config.yaml - configuration for requests_dashboard.py
+#
+#   python requests_dashboard.py --config "Configuration\requests_config.yaml"
+#
+# Lives in:
+#   ...\HK1 Projects 2026\Corrugate Requests\Configuration\
+# =============================================================================
+
+paths:
+  # Folder holding the request workbook. Most recently modified is used.
+  source_folder: 'C:\Users\Olatunji.Adeoye\OneDrive - Power Stop, LLC\Documents\HK1 Projects 2026\Corrugate Master Module\Corrugate Requests Log BP1 and HK1 - ETA - Order Tracker'
+
+  # Pin one specific workbook instead of taking the newest. null = newest.
+  file: null
+
+  # Written where the hub tile expects it.
+  output_html: 'C:\Users\Olatunji.Adeoye\OneDrive - Power Stop, LLC\Documents\HK1 Projects 2026\Corrugate Master Module\Corrugate Requests Log BP1 and HK1 - ETA - Order Tracker\Request_ETA_Dashboard.html'
+
+  # Dated copy of each run, shared with the other dashboards.
+  archive_folder: 'C:\Users\Olatunji.Adeoye\OneDrive - Power Stop, LLC\Documents\HK1 Projects 2026\Corrugate Master Module\Dashboard Archive'
+
+  # Absolute on purpose: this config sits in a Configuration subfolder, and
+  # build_all.py / Task Scheduler may run from any working directory.
+
+source:
+  # Which files to consider in source_folder. Lock files (~$...) are ignored.
+  glob: '*.xls*'
+
+display:
+  title: 'Order & ETA Tracker'
+  # The word rendered in italic amber inside the title.
+  title_emphasis: 'ETA'
+  eyebrow: 'Corrugate requests · HK1 & BP1'
+  # Parse warnings are not shown on the page. They still print to the console
+  # on every run, which is where a mistyped tab name will surface.
+  show_parse_warnings: false
+
+# =============================================================================
+# Worksheet tab prefix -> distribution center.
+#
+# The site is read from the letters before the date in each tab name, so
+# "HK 9-8-26" is Hodgkins and "BP 9-8-26" is Bedford Park. Case, spaces, and
+# punctuation are ignored.
+#
+# These are layered on top of the built-in list (HK, HK1, HODGKINS, BP, BP1,
+# BEDFORD, BEDFORDPARK), so you only need entries here for anything unusual.
+# A tab whose prefix is not recognised is still shown, flagged as a parse
+# warning - never silently filed under the wrong site.
+# =============================================================================
+sites: {}
+  # Example - uncomment and edit if a tab gets named differently:
+  # 'HODG': HK1
+  # 'BEDPK': BP1

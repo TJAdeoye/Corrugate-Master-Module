@@ -1,0 +1,60 @@
+# =============================================================================
+# hub_config.yaml - configuration for master_hub.py
+#
+#   python master_hub.py --config "Configuration\hub_config.yaml"
+#
+# Builds the single landing page of tiles for the Corrugate Master Module.
+# Each tile links to a dashboard and reports when that dashboard was last
+# generated, so a stale tile is visible before you present from it.
+# =============================================================================
+
+paths:
+  # Root of the module. Tile links are written relative to the page when the
+  # target sits under this root, so the folder can be moved or synced without
+  # breaking them.
+  module_root: 'C:\Users\Olatunji.Adeoye\OneDrive - Power Stop, LLC\Documents\HK1 Projects 2026\Corrugate Master Module'
+
+  # Where the hub page itself is written.
+  output_html: 'C:\Users\Olatunji.Adeoye\OneDrive - Power Stop, LLC\Documents\HK1 Projects 2026\Corrugate Master Module\Corrugate Master Module.html'
+
+display:
+  title: 'Corrugate Master Module'
+  title_emphasis: 'Master'
+  eyebrow: 'Power Stop · HK1 & BP1'
+  # Days after which a dashboard's "last generated" stamp turns amber.
+  stale_after_days: 1
+
+# =============================================================================
+# Tiles, in the order they appear.
+#
+#   name        heading on the tile
+#   blurb       one line under it
+#   href        the dashboard HTML this tile opens
+#   source      folder or file the dashboard is built from (shown as context)
+#   accent      amber | blue | green | red | plain
+#   status      live    -> tile is clickable, shows last-generated stamp
+#               pending -> greyed out, not clickable, shows the note below
+#   note        only used when status is pending
+# =============================================================================
+
+tiles:
+  - name: 'Burn Rate - HK1 & BP1'
+    blurb: 'Per-SKU consumption and days of cover, 21-day rolling window'
+    href: 'Corrugate Counts\Burn_Rate_Dashboard.html'
+    source: 'Corrugate Counts\ + Corrugate Delivery File\'
+    accent: amber
+    status: live
+
+  - name: 'TRG On-Hand Inventory'
+    blurb: 'Supplier floor stock, burn rate, and days of cover'
+    href: 'TRG OH Quantity\TRG_Inventory_Dashboard.html'
+    source: 'TRG OH Quantity\'
+    accent: blue
+    status: live
+
+  - name: 'Order & ETA Tracker'
+    blurb: 'What each DC requested, and the delivery ETA assigned to it'
+    href: 'Corrugate Requests Log BP1 and HK1 - ETA - Order Tracker\Request_ETA_Dashboard.html'
+    source: 'Corrugate Requests Log BP1 and HK1 - ETA - Order Tracker\'
+    accent: green
+    status: live

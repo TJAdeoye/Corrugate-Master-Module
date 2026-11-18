@@ -1,0 +1,103 @@
+# =============================================================================
+# trg_config.yaml - configuration for trg_dashboard.py
+#
+#   python trg_dashboard.py --config trg_config.yaml
+#
+# Everything the script needs lives here. When TRG renames a line on their
+# sheet, edit `sku_map` below - no Python changes required.
+# =============================================================================
+
+paths:
+  # TRG inventory workbooks live here. Newest by filename date is used.
+  source_folder: 'C:\Users\Olatunji.Adeoye\OneDrive - Power Stop, LLC\Documents\HK1 Projects 2026\Corrugate Master Module\TRG OH Quantity'
+
+  # Written where the hub tile expects it.
+  output_html: 'C:\Users\Olatunji.Adeoye\OneDrive - Power Stop, LLC\Documents\HK1 Projects 2026\Corrugate Master Module\TRG OH Quantity\TRG_Inventory_Dashboard.html'
+
+  # Dated copy of each run, shared with the other dashboards.
+  archive_folder: 'C:\Users\Olatunji.Adeoye\OneDrive - Power Stop, LLC\Documents\HK1 Projects 2026\Corrugate Master Module\Dashboard Archive'
+
+  # Absolute on purpose: this config sits in a Configuration subfolder, and
+  # build_all.py / Task Scheduler may run from any working directory.
+
+source:
+  # Which files to consider. Lock files (~$...) are always ignored.
+  glob: '*.xls*'
+
+  # The report date is read from the filename first (e.g. "9-2-26"), and
+  # falls back to the file's modified timestamp when no date is present.
+  prefer_filename_date: true
+
+  # Worksheet to read. null = first sheet in the workbook.
+  sheet: null
+
+  # Row the SKU blocks start on, and the column layout (1-indexed).
+  first_data_row: 6
+  columns:
+    name: 1          # A · box name
+    due: 2           # B · TRG order due
+    qty: 3           # C · qty on hand (may also carry in-process)
+    released: 4      # D · last date released by Power Stop
+    reorder: 5       # E · re-order qty required
+    burn: 6          # F · burn rate, units/day
+
+thresholds:
+  # Days of cover. At or below `critical` = red; at or below `watch` = amber.
+  critical_days: 2
+  watch_days: 5
+
+  # Report age in days before the header indicator turns amber.
+  stale_after_days: 1
+
+display:
+  title: 'TRG On-Hand Inventory'
+  # The word rendered in italic amber inside the title.
+  title_emphasis: 'On-Hand'
+  subtitle: 'Boxes held at TRG, burn rate, and days of cover'
+  # Banners are off. Set to true to show the report-age and
+  # missing-SKU notices at the top of the dashboard.
+  show_freshness_banner: false
+  show_missing_sku_banner: false
+  # Parse warnings are not shown on the page. They still print to the console
+  # on every run.
+  show_parse_warnings: false
+
+# =============================================================================
+# TRG's line name  ->  our canonical nomenclature.
+# Keys are matched case-insensitively with spaces and punctuation stripped,
+# so "14  X14 X 8 Plain - C" and "14x14x8 Plain-C" both resolve.
+# Add a new line here whenever TRG introduces or renames one.
+# =============================================================================
+sku_map:
+  '12 X 12 X 8 Plain - A':      APLAIN
+  '12X12X8 Printed - A':        APRINTED
+  '14 X14 X 8 Plain - C':       CPLAIN
+  '14 X 14 X 8 Printed - C':    CPRINTED
+  '14X14X10 Pl EDW':            EPLAIN
+  '14X14X10 PR EDW':            EPRINTED
+  '14X14X14 PL BDW':            BPLAIN
+  '14X14X14 PR BDW':            BPRINTED
+  '16 X 16 X 10 PL FDW':        FPLAIN
+  '16 X 16 X 10 PR FDW':        FPRINTED
+  '16 X 16 X 12 Printed':       DPRINT
+  '16X16X16 PL GDW':            GPLAIN
+  '16X16X16 PR GDW':            GPRINTED
+  '14X14X18 CAZ Out':           OPRINTED
+  '161620 F-AZ':                JPLAIN     # 16x16x20 - confirmed as JPLAIN
+  '171722':                     HPRINT
+  'Pallet Chimney':             CHIMNEY
+  'Pallet Chimeny Insert':      INSERTS    # sic - TRG's spelling
+  'Pallet Chimney Insert':      INSERTS    # in case they fix it
+  'Pallet Sheet':               SHEETS
+  'Pallet Sheets':              SHEETS
+  'Powerclear Wiper Carton':    WIPER
+
+# Canonical SKUs we expect but that TRG does not currently stock.
+# Listing them here keeps them out of the "missing" count so a genuine
+# gap still stands out. Remove a line if TRG starts carrying it.
+not_stocked_at_trg:
+  - ACAL    # 12x12x8 Callahan
+  - ECAL    # 14x14x10 Callahan
+  - FCAL    # 16x16x10 Callahan
+  - GCAL    # 16x16x16 Callahan
+  - BCAL    # 14x14x14 Callahan
